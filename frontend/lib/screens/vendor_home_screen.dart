@@ -350,7 +350,12 @@ class _VendorBookingsViewState extends State<VendorBookingsView> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Booking $status!')));
       _fetchBookings();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to update status')));
+      try {
+        final errorData = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorData['message'] ?? 'Failed to update status')));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to update status')));
+      }
     }
   }
 

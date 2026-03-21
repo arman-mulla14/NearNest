@@ -69,7 +69,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     radius: 40,
                     backgroundColor: AppTheme.accentColor.withOpacity(0.2),
                     child: Text(
-                      user?['name']?.substring(0, 1).toUpperCase() ?? 'U',
+                      (user?['name'] != null && user!['name'].isNotEmpty)
+                          ? user['name'].substring(0, 1).toUpperCase()
+                          : 'U',
                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.accentColor),
                     ),
                   ),

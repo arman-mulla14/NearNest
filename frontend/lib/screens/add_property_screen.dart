@@ -159,7 +159,10 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     initialValue: beds.toString(),
-                    decoration: const InputDecoration(labelText: 'Available Beds/Units', prefixIcon: Icon(Icons.bed)),
+                    decoration: InputDecoration(
+                      labelText: propertyType == 'Restaurant' ? 'Available Tables' : 'Available Beds/Units',
+                      prefixIcon: Icon(propertyType == 'Restaurant' ? Icons.restaurant : Icons.bed),
+                    ),
                     keyboardType: TextInputType.number,
                     onSaved: (v) => beds = int.tryParse(v!) ?? 1,
                     validator: (v) => v!.isEmpty ? 'Enter count' : null,

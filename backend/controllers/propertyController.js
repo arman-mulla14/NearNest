@@ -40,7 +40,7 @@ exports.getPropertyById = async (req, res) => {
 
 exports.createProperty = async (req, res) => {
   try {
-    const { title, description, location, price, propertyType, images, facilities, availableBeds } = req.body;
+    const { title, description, location, price, propertyType, images, facilities, availableBeds, availableTables } = req.body;
     
     const property = new Property({
       vendor: req.user._id,
@@ -51,7 +51,8 @@ exports.createProperty = async (req, res) => {
       propertyType,
       images: images || [],
       facilities: facilities || [],
-      availableBeds
+      availableBeds,
+      availableTables
     });
 
     const createdProperty = await property.save();
@@ -78,6 +79,7 @@ exports.updateProperty = async (req, res) => {
       property.images = req.body.images || property.images;
       property.facilities = req.body.facilities || property.facilities;
       property.availableBeds = req.body.availableBeds !== undefined ? req.body.availableBeds : property.availableBeds;
+      property.availableTables = req.body.availableTables !== undefined ? req.body.availableTables : property.availableTables;
 
       const updatedProperty = await property.save();
       res.json(updatedProperty);

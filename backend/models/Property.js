@@ -10,6 +10,7 @@ const propertySchema = new mongoose.Schema({
   images: [{ type: String }],
   facilities: [{ type: String }],
   availableBeds: { type: Number, default: 1 },
+  availableTables: { type: Number, default: 0 },
   ratings: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     name: { type: String },
