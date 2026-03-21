@@ -1,0 +1,54 @@
+﻿[ΓêÜ] Flutter (Channel stable, 3.24.0, on Microsoft Windows [Version 10.0.26200.8037], locale en-IN)
+    ΓÇó Flutter version 3.24.0 on channel stable at D:\flutter
+    ΓÇó Upstream repository https://github.com/flutter/flutter.git
+    ΓÇó Framework revision 80c2e84975 (1 year, 8 months ago), 2024-07-30 23:06:49 +0700
+    ΓÇó Engine revision b8800d88be
+    ΓÇó Dart version 3.5.0
+    ΓÇó DevTools version 2.37.2
+
+[ΓêÜ] Windows Version (Installed version of Windows is version 10 or higher)
+
+[!] Android toolchain - develop for Android devices (Android SDK version 35.0.0)
+    ΓÇó Android SDK at C:\Users\Admin\AppData\Local\Android\Sdk
+    X cmdline-tools component is missing
+      Run `path/to/sdkmanager --install "cmdline-tools;latest"`
+      See https://developer.android.com/studio/command-line for more details.
+    X Android license status unknown.
+      Run `flutter doctor --android-licenses` to accept the SDK licenses.
+      See https://flutter.dev/to/windows-android-setup for more details.
+
+[ΓêÜ] Chrome - develop for the web
+    ΓÇó Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[!] Visual Studio - develop Windows apps (Visual Studio Community 2026 18.2.2)
+    ΓÇó Visual Studio at C:\Program Files\Microsoft Visual Studio\18\Community
+    ΓÇó Visual Studio Community 2026 version 18.2.11430.68
+    X Visual Studio is missing necessary components. Please re-run the Visual Studio installer for the "Desktop development with C++" workload, and include these components:
+        MSVC v142 - VS 2019 C++ x64/x86 build tools
+         - If there are multiple build tool versions available, install the latest
+        C++ CMake tools for Windows
+        Windows 10 SDK
+
+[ΓêÜ] Android Studio (version 2025.3.2)
+    ΓÇó Android Studio at D:\Android\Android Studio
+    ΓÇó Flutter plugin can be installed from:
+       https://plugins.jetbrains.com/plugin/9212-flutter
+    ΓÇó Dart plugin can be installed from:
+       https://plugins.jetbrains.com/plugin/6351-dart
+    ΓÇó Java version OpenJDK Runtime Environment (build 21.0.9+-14787801-b1163.94)
+
+[ΓêÜ] VS Code (version unknown)
+    ΓÇó VS Code at C:\Users\Admin\AppData\Local\Programs\Microsoft VS Code
+    ΓÇó Flutter extension can be installed from:
+       https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter
+    X Unable to determine VS Code version.
+
+[ΓêÜ] Connected device (3 available)
+    ΓÇó Windows (desktop) ΓÇó windows ΓÇó windows-x64    ΓÇó Microsoft Windows [Version 10.0.26200.8037]
+    ΓÇó Chrome (web)      ΓÇó chrome  ΓÇó web-javascript ΓÇó Google Chrome 146.0.7680.80
+    ΓÇó Edge (web)        ΓÇó edge    ΓÇó web-javascript ΓÇó Microsoft Edge 146.0.3856.62
+
+[ΓêÜ] Network resources
+    ΓÇó All expected network resources are available.
+
+! Doctor found issues in 2 categories.

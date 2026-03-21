@@ -10,6 +10,22 @@ exports.createBooking = async (req, res) => {
     if (!property) return res.status(404).json({ message: 'Property not found' });
     
     const actualVendorId = vendorId || property.vendor;
+    
+    // Safety check: Cannot book own property
+    if (actualVendorId.toString() === req.user._id.toString()) {
+      return res.status(400).json({ message: 'Vendors cannot book their own property' });
+    }
+
+    // Availability check
+    if (property.propertyType === 'Restaurant') {
+      if (property.availableTables <= 0) {
+        return res.status(400).json({ message: 'No availability for this restaurant at the moment' });
+      }
+    } else {
+      if (property.availableBeds <= 0) {
+        return res.status(400).json({ message: 'No availability for this property at the moment' });
+      }
+    }
 
     const booking = new Booking({
       property: propertyId,
@@ -69,29 +85,38 @@ exports.updateBookingStatus = async (req, res) => {
       return res.status(401).json({ message: 'Not authorized' });
     }
     
+    // Check for availability BEFORE accepting
     if (status === 'accepted' && booking.status !== 'accepted') {
       const property = await Property.findById(booking.property);
       if (property) {
-        if (property.propertyType !== 'Restaurant') {
-          if (property.availableBeds > 0) {
-            property.availableBeds -= 1;
-            // Mark that we decremented it on this booking to allow safe restore
-            booking.bedsDecremented = true; 
+        if (property.propertyType === 'Restaurant') {
+          if (property.availableTables <= 0) {
+            return res.status(400).json({ message: 'No tables available for this restaurant' });
           }
+          property.availableTables -= 1;
+          booking.tablesDecremented = true;
+        } else {
+          if (property.availableBeds <= 0) {
+            return res.status(400).json({ message: 'No beds available for this property' });
+          }
+          property.availableBeds -= 1;
+          booking.bedsDecremented = true;
         }
         await property.save();
       }
     }
-    // Optional defensive logic if a vendor somehow cancels an accepted booking
+    // Handle restoration if an accepted booking is changed or cancelled
     else if (status !== 'accepted' && booking.status === 'accepted') {
       const property = await Property.findById(booking.property);
-      if (property && booking.bedsDecremented) {
-        property.availableBeds += 1;
-        booking.bedsDecremented = false;
-        await property.save();
-      } else if (property && property.propertyType !== 'Restaurant' && property.availableBeds >= 0 && typeof booking.bedsDecremented === 'undefined') {
-        // Fallback if bedsDecremented wasn't tracked previously
-        property.availableBeds += 1;
+      if (property) {
+        if (booking.bedsDecremented) {
+          property.availableBeds += 1;
+          booking.bedsDecremented = false;
+        }
+        if (booking.tablesDecremented) {
+          property.availableTables += 1;
+          booking.tablesDecremented = false;
+        }
         await property.save();
       }
     }

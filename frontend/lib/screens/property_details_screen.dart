@@ -119,13 +119,13 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text('Availability', style: TextStyle(color: AppTheme.textSecondaryColor)),
+                          Text(_property.propertyType == 'Restaurant' ? 'Seating' : 'Availability', style: TextStyle(color: AppTheme.textSecondaryColor)),
                           Row(
                             children: [
-                              const Icon(Icons.bed_outlined, color: AppTheme.accentColor, size: 20),
+                              Icon(_property.propertyType == 'Restaurant' ? Icons.restaurant : Icons.bed_outlined, color: AppTheme.accentColor, size: 20),
                               const SizedBox(width: 4),
                               Text(
-                                '${_property.availableBeds} beds',
+                                _property.propertyType == 'Restaurant' ? '${_property.availableBeds} tables' : '${_property.availableBeds} beds',
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -256,7 +256,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             // Book button
             Expanded(
               child: ElevatedButton(
-                onPressed: () async {
+                onPressed: (_property.propertyType != 'Restaurant' && _property.availableBeds <= 0) ? null : () async {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Processing booking...')));
                   final response = await ApiService.post('/bookings', {
                     'propertyId': _property.id,
@@ -267,11 +267,15 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                   });
                   if (response.statusCode == 201) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking request sent successfully to the Vendor!')));
+                    _fetchLatestProperty();
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Booking failed: ${response.body}')));
                   }
                 },
-                child: const Text('BOOK NOW'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: (_property.propertyType != 'Restaurant' && _property.availableBeds <= 0) ? Colors.grey : AppTheme.accentColor,
+                ),
+                child: Text((_property.propertyType != 'Restaurant' && _property.availableBeds <= 0) ? 'SOLD OUT' : 'BOOK NOW'),
               ),
             ),
           ],
