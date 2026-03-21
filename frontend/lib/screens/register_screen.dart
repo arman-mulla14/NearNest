@@ -31,8 +31,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     final success = await authProvider.register(name, email, password, _selectedRole);
+    if (!mounted) return;
+    
     if (success) {
-      Navigator.popUntil(context, ModalRoute.withName('/login'));
       if (_selectedRole.toLowerCase() == 'vendor') {
         Navigator.pushReplacementNamed(context, '/vendor_home');
       } else {

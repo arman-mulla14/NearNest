@@ -95,6 +95,36 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateProfile(String name, String phone) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await ApiService.put('/auth/profile', {
+        'name': name,
+        'phone': phone,
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        _token = data['token'];
+        _user = data;
+        
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', _token!);
+        await prefs.setString('user', jsonEncode(_user));
+        
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {}
+    
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+
   Future<void> logout() async {
     _token = null;
     _user = null;

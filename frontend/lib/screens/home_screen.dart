@@ -65,11 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('NearNest'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_outlined, color: AppTheme.textPrimaryColor),
+            icon: Icon(Icons.notifications_none_outlined, color: Theme.of(context).appBarTheme.iconTheme?.color),
             onPressed: () {},
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.person_outline, color: AppTheme.textPrimaryColor),
+            icon: Icon(Icons.person_outline, color: Theme.of(context).appBarTheme.iconTheme?.color),
             onSelected: (value) async {
               if (value == 'profile') {
                 Navigator.push(
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextField(
               decoration: InputDecoration(
                 hintText: 'Search locations or properties...',
-                prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondaryColor),
+                prefixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
                 suffixIcon: const Icon(Icons.tune, color: AppTheme.accentColor),
               ),
             ),
@@ -128,13 +128,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: Text(
                         filter,
                         style: TextStyle(
-                          color: isSelected ? AppTheme.primaryColor : AppTheme.textPrimaryColor,
+                          color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyLarge?.color,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                       selected: isSelected,
                       selectedColor: AppTheme.accentColor,
-                      backgroundColor: AppTheme.cardColor,
+                      backgroundColor: Theme.of(context).cardColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                         side: BorderSide(

@@ -1,46 +1,6 @@
 
-Running Gradle task 'assembleRelease'...                        
-
-FAILURE: Build completed with 2 failures.
-
-1: Task failed with an exception.
------------
-* Where:
-Build file 'C:\Users\Admin\OneDrive\Desktop\NearNest\frontend\android\build.gradle' line: 23
-
-* What went wrong:
-A problem occurred evaluating root project 'android'.
-> It is too late to set compileSdk
-  It has already been read to configure this project.
-  Consider either moving this call to be during evaluation,
-  or using the variant API.
-
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
-==============================================================================
-
-2: Task failed with an exception.
------------
-* Where:
-Build file 'C:\Users\Admin\OneDrive\Desktop\NearNest\frontend\android\build.gradle' line: 23
-
-* What went wrong:
-A problem occurred evaluating root project 'android'.
-> It is too late to set compileSdk
-  It has already been read to configure this project.
-  Consider either moving this call to be during evaluation,
-  or using the variant API.
-
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
-==============================================================================
-
-BUILD FAILED in 1s
-Running Gradle task 'assembleRelease'...                         1,944ms
-Gradle task assembleRelease failed with exit code 1
+Compiling lib\main.dart for the Web...                          
+Font asset "CupertinoIcons.ttf" was tree-shaken, reducing it from 257628 to 1172 bytes (99.5% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 14100 bytes (99.1% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Compiling lib\main.dart for the Web...                             34.7s
+√ Built build\web
