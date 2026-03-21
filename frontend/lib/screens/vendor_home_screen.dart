@@ -9,6 +9,7 @@ import '../services/api_service.dart';
 import 'add_property_screen.dart';
 import 'chats_list_screen.dart';
 import 'chat_screen.dart';
+import 'user_profile_screen.dart';
 
 class VendorHomeScreen extends StatefulWidget {
   const VendorHomeScreen({Key? key}) : super(key: key);
@@ -24,7 +25,7 @@ class _VendorHomeScreenState extends State<VendorHomeScreen> {
     const VendorDashboardView(),
     const VendorPropertiesView(),
     const VendorBookingsView(),
-    const VendorProfileView(),
+    const UserProfileScreen(),
   ];
 
   @override

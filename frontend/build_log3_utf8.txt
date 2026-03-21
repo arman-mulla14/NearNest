@@ -1,0 +1,84 @@
+﻿
+Running Gradle task 'assembleRelease'...                        
+flutter : Warning: SDK 
+processing. This version 
+only understands SDK XML 
+versions up to 3 but an SDK 
+XML file of version 4 was 
+encountered. This can happen 
+if you use versions of 
+Android Studio and the 
+command-line tools that were 
+released at different times.
+At line:1 char:1
++ flutter build apk 
+--release > build_log3.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Warning  
+  : SDK pr...ifferent time   
+ s.:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+
+FAILURE: Build failed with 
+an exception.
+
+* What went wrong:
+Execution failed for task ':f
+lutter_plugin_android_lifecyc
+le:compileReleaseJavaWithJava
+c'.
+> Could not resolve all 
+files for configuration ':flu
+tter_plugin_android_lifecycle
+:androidJdkImage'.
+   > Failed to transform 
+core-for-system-modules.jar 
+to match attributes {artifact
+Type=_internal_android_jdk_im
+age, org.gradle.libraryelemen
+ts=jar, org.gradle.usage=java
+-runtime}.
+      > Execution failed for 
+JdkImageTransform: C:\Users\A
+dmin\AppData\Local\Android\Sd
+k\platforms\android-35\core-f
+or-system-modules.jar.
+         > Error while 
+executing process 
+D:\Android\Android 
+Studio\jbr\bin\jlink.exe 
+with arguments 
+{--module-path C:\Users\Admin
+\.gradle\caches\transforms-3\
+553613a84d05acdd2c77a3a42cde4
+0d4\transformed\output\temp\j
+mod --add-modules java.base 
+--output C:\Users\Admin\.grad
+le\caches\transforms-3\553613
+a84d05acdd2c77a3a42cde40d4\tr
+ansformed\output\jdkImage 
+--disable-plugin 
+system-modules}
+
+* Try:
+> Run with --stacktrace 
+option to get the stack 
+trace.
+> Run with --info or --debug 
+option to get more log 
+output.
+> Run with --scan to get 
+full insights.
+> Get more help at 
+https://help.gradle.org.
+
+BUILD FAILED in 13s
+Running Gradle task 'assembleRelease'...                           14.7s
+Gradle task assembleRelease 
+failed with exit code 1

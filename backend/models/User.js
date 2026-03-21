@@ -6,6 +6,12 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String },
+  profilePhoto: { type: String },
+  dob: { type: Date },
+  address: { type: String },
+  preferredLocation: { type: String },
+  isVerified: { type: Boolean, default: false },
+  notificationsEnabled: { type: Boolean, default: true },
   role: { type: String, enum: ['User', 'Vendor', 'Admin'], default: 'User' },
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }]
 }, { timestamps: true });

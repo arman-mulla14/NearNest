@@ -6,6 +6,7 @@ import '../widgets/property_card.dart';
 import 'dart:convert';
 import '../services/api_service.dart';
 import '../providers/auth_provider.dart';
+import 'user_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -70,7 +71,12 @@ class _HomeScreenState extends State<HomeScreen> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.person_outline, color: AppTheme.textPrimaryColor),
             onSelected: (value) async {
-              if (value == 'logout') {
+              if (value == 'profile') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+                );
+              } else if (value == 'logout') {
                 final authProvider = Provider.of<AuthProvider>(context, listen: false);
                 await authProvider.logout();
                 Navigator.pushReplacementNamed(context, '/login');
