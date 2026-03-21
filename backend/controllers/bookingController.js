@@ -5,10 +5,16 @@ const Message = require('../models/Message');
 exports.createBooking = async (req, res) => {
   try {
     const { propertyId, vendorId, checkInDate, checkOutDate, totalPrice } = req.body;
+    
+    const property = await Property.findById(propertyId);
+    if (!property) return res.status(404).json({ message: 'Property not found' });
+    
+    const actualVendorId = vendorId || property.vendor;
+
     const booking = new Booking({
       property: propertyId,
       user: req.user._id,
-      vendor: vendorId,
+      vendor: actualVendorId,
       checkInDate,
       checkOutDate,
       totalPrice
@@ -17,11 +23,10 @@ exports.createBooking = async (req, res) => {
 
     // Auto-generate a chat message from user to vendor about the booking
     try {
-      const property = await Property.findById(propertyId);
       const autoMessage = new Message({
         sender: req.user._id,
-        receiver: vendorId,
-        text: `Hello! I would like to book your property "${property ? property.title : 'Listed Property'}" from ${new Date(checkInDate).toLocaleDateString()} to ${new Date(checkOutDate).toLocaleDateString()}. Please check your Bookings Dashboard to review my request!`
+        receiver: actualVendorId,
+        text: `Hello! I would like to book your property "${property.title}" from ${new Date(checkInDate).toLocaleDateString()} to ${new Date(checkOutDate).toLocaleDateString()}. Please check your Bookings Dashboard to review my request!`
       });
       await autoMessage.save();
     } catch (msgErr) {
@@ -67,17 +72,25 @@ exports.updateBookingStatus = async (req, res) => {
     if (status === 'accepted' && booking.status !== 'accepted') {
       const property = await Property.findById(booking.property);
       if (property) {
-        if (property.availableBeds > 0) {
-          property.availableBeds -= 1;
+        if (property.propertyType !== 'Restaurant') {
+          if (property.availableBeds > 0) {
+            property.availableBeds -= 1;
+            // Mark that we decremented it on this booking to allow safe restore
+            booking.bedsDecremented = true; 
+          }
         }
-        // Force save without blocking the vendor from accepting Rents/Rooms
         await property.save();
       }
     }
     // Optional defensive logic if a vendor somehow cancels an accepted booking
     else if (status !== 'accepted' && booking.status === 'accepted') {
       const property = await Property.findById(booking.property);
-      if (property) {
+      if (property && booking.bedsDecremented) {
+        property.availableBeds += 1;
+        booking.bedsDecremented = false;
+        await property.save();
+      } else if (property && property.propertyType !== 'Restaurant' && property.availableBeds >= 0 && typeof booking.bedsDecremented === 'undefined') {
+        // Fallback if bedsDecremented wasn't tracked previously
         property.availableBeds += 1;
         await property.save();
       }
