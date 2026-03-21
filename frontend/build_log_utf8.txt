@@ -1,0 +1,65 @@
+﻿
+Running Gradle task 'assembleRelease'...                        
+flutter : 
+At line:1 char:1
++ flutter build apk 
+--release > build_log.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+FAILURE: Build failed with 
+an exception.
+
+* What went wrong:
+Execution failed for task 
+':gradle:compileGroovy'.
+> BUG! exception in phase 
+'semantic analysis' in 
+source unit 'D:\flutter\packa
+ges\flutter_tools\gradle\src\
+main\groovy\app_plugin_loader
+.groovy' Unsupported class 
+file major version 65
+
+* Try:
+> Run with --stacktrace 
+option to get the stack 
+trace.
+> Run with --info or --debug 
+option to get more log 
+output.
+> Run with --scan to get 
+full insights.
+
+* Get more help at 
+https://help.gradle.org
+
+BUILD FAILED in 6s
+Running Gradle task 'assembleRelease'...                            7.4s
+
+ΓöîΓöÇ Flutter Fix ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+Γöé [!] Your project's Gradle version is incompatible with the Java version that Flutter is using    Γöé
+Γöé for Gradle.                                                                                      Γöé
+Γöé                                                                                                  Γöé
+Γöé If you recently upgraded Android Studio, consult the migration guide at                          Γöé
+Γöé https://flutter.dev/to/to/java-gradle-incompatibility.                                           Γöé
+Γöé                                                                                                  Γöé
+Γöé Otherwise, to fix this issue, first, check the Java version used by Flutter by running `flutter  Γöé
+Γöé doctor --verbose`.                                                                               Γöé
+Γöé                                                                                                  Γöé
+Γöé Then, update the Gradle version specified in                                                     Γöé
+Γöé C:\Users\Admin\OneDrive\Desktop\NearNest\frontend\android\gradle\wrapper\gradle-wrapper.properti Γöé
+Γöé es to be compatible with that Java version. See the link below for more information on           Γöé
+Γöé compatible Java/Gradle versions:                                                                 Γöé
+Γöé https://docs.gradle.org/current/userguide/compatibility.html#java                                Γöé
+Γöé                                                                                                  Γöé
+Γöé                                                                                                  Γöé
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+Gradle task assembleRelease 
+failed with exit code 1
