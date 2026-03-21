@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking');
 const Property = require('../models/Property');
+const Message = require('../models/Message');
 
 exports.createBooking = async (req, res) => {
   try {
@@ -13,6 +14,20 @@ exports.createBooking = async (req, res) => {
       totalPrice
     });
     const createdBooking = await booking.save();
+
+    // Auto-generate a chat message from user to vendor about the booking
+    try {
+      const property = await Property.findById(propertyId);
+      const autoMessage = new Message({
+        sender: req.user._id,
+        receiver: vendorId,
+        text: `Hello! I would like to book your property "${property ? property.title : 'Listed Property'}" from ${new Date(checkInDate).toLocaleDateString()} to ${new Date(checkOutDate).toLocaleDateString()}. Please check your Bookings Dashboard to review my request!`
+      });
+      await autoMessage.save();
+    } catch (msgErr) {
+      console.log('Automated booking message failed to send:', msgErr);
+    }
+
     res.status(201).json(createdBooking);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -54,10 +69,9 @@ exports.updateBookingStatus = async (req, res) => {
       if (property) {
         if (property.availableBeds > 0) {
           property.availableBeds -= 1;
-          await property.save();
-        } else {
-          return res.status(400).json({ message: 'No available beds left to accept this booking.' });
         }
+        // Force save without blocking the vendor from accepting Rents/Rooms
+        await property.save();
       }
     }
     // Optional defensive logic if a vendor somehow cancels an accepted booking
