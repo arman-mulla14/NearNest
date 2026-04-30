@@ -62,17 +62,31 @@ class VendorDashboardView extends StatefulWidget {
   _VendorDashboardViewState createState() => _VendorDashboardViewState();
 }
 
-class _VendorDashboardViewState extends State<VendorDashboardView> {
+class _VendorDashboardViewState extends State<VendorDashboardView> with TickerProviderStateMixin {
   int _activeListings = 0;
   int _totalBookings = 0;
   double _totalEarnings = 0;
   int _pendingBookings = 0;
   bool _isLoading = true;
+  late AnimationController _fadeController;
 
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000));
     _fetchStats();
+    _fadeController.forward();
+    
+    // Refresh profile to get original data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).refreshProfile();
+    });
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchStats() async {
@@ -81,33 +95,52 @@ class _VendorDashboardViewState extends State<VendorDashboardView> {
     if (vendorId == null) return;
     
     try {
-      final propertiesRes = await ApiService.get('/properties?vendor=$vendorId');
-      if (propertiesRes.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(propertiesRes.body);
+      // Use cache for properties
+      await ApiService.getWithCache(
+        endpoint: '/properties?vendor=$vendorId',
+        onCacheHit: (data) => _processProperties(data),
+        onSourceUpdate: (data) => _processProperties(data),
+      );
+
+      // Use cache for bookings
+      await ApiService.getWithCache(
+        endpoint: '/bookings/vendor',
+        onCacheHit: (data) => _processBookings(data),
+        onSourceUpdate: (data) => _processBookings(data),
+      );
+    } catch (e) {
+      debugPrint('Stats Error: $e');
+    }
+  }
+
+  void _processProperties(dynamic data) {
+    if (data is List && mounted) {
+      setState(() {
         _activeListings = data.length;
-      }
-      
-      final bookingsRes = await ApiService.get('/bookings/vendor');
-      if (bookingsRes.statusCode == 200) {
-        final List<dynamic> bData = jsonDecode(bookingsRes.body);
-        int total = 0;
-        double earnings = 0;
-        int pending = 0;
-        for (var b in bData) {
-          if (b['status'] == 'accepted') {
-            total++;
-            earnings += (b['totalPrice'] ?? 0).toDouble();
-          } else if (b['status'] == 'pending') {
-            pending++;
-          }
+      });
+    }
+  }
+
+  void _processBookings(dynamic bData) {
+    if (bData is List && mounted) {
+      int total = 0;
+      double earnings = 0;
+      int pending = 0;
+      for (var b in bData) {
+        if (b['status'] == 'accepted') {
+          total++;
+          earnings += (b['totalPrice'] ?? 0).toDouble();
+        } else if (b['status'] == 'pending') {
+          pending++;
         }
+      }
+      setState(() {
         _totalBookings = total;
         _totalEarnings = earnings;
         _pendingBookings = pending;
-      }
-      setState(() {});
-    } catch (e) {}
-    setState(() => _isLoading = false);
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -115,79 +148,112 @@ class _VendorDashboardViewState extends State<VendorDashboardView> {
     final authProvider = Provider.of<AuthProvider>(context);
     final vendorName = authProvider.user?['name'] ?? 'Vendor';
 
-    return CustomScrollView(
+    return RefreshIndicator(
+      onRefresh: _fetchStats,
+      child: CustomScrollView(
       slivers: [
         SliverAppBar(
           title: const Text('Vendor Dashboard'),
           floating: true,
+          pinned: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatsListScreen()));
-              },
+              icon: const Icon(Icons.refresh),
+              onPressed: _fetchStats,
+            ),
+            IconButton(
+              icon: const Icon(Icons.chat_bubble_outline),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatsListScreen())),
             ),
           ],
         ),
-        SliverPadding(
-          padding: const EdgeInsets.all(16.0),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate([
-              Text('Welcome back, $vendorName!', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 20),
-              // Analytics Cards
-              Row(
-                children: [
-                  Expanded(child: _buildMetricCard(context, 'Active Listings', _isLoading ? '-' : '$_activeListings', Icons.home_work, AppTheme.primaryColor)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildMetricCard(context, 'Total Bookings', _isLoading ? '-' : '$_totalBookings', Icons.check_circle, AppTheme.accentColor)),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(child: _buildMetricCard(context, 'Total Earnings', _isLoading ? '-' : '₹$_totalEarnings', Icons.currency_rupee, Colors.orange)),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildMetricCard(context, 'Pending Requests', _isLoading ? '-' : '$_pendingBookings', Icons.pending_actions, AppTheme.secondaryColor)),
-                ],
-              ),
-              const SizedBox(height: 30),
-              Text('Recent Activity', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 10),
-              const Padding(padding: EdgeInsets.all(16), child: Text("No recent activity.", style: TextStyle(color: AppTheme.textSecondaryColor))),
-            ]),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Welcome back,', style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+                Text('$vendorName!', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+                const SizedBox(height: 24),
+                
+                _buildAnimatedRow(0, [
+                  _buildMetricCard('Active Listings', '$_activeListings', Icons.home_work, AppTheme.primaryColor),
+                  _buildMetricCard('Bookings', '$_totalBookings', Icons.check_circle, AppTheme.accentColor),
+                ]),
+                const SizedBox(height: 16),
+                _buildAnimatedRow(1, [
+                  _buildMetricCard('Earnings', '₹${_totalEarnings.toStringAsFixed(0)}', Icons.currency_rupee, Colors.green),
+                  _buildMetricCard('Pending', '$_pendingBookings', Icons.pending_actions, Colors.orange),
+                ]),
+                
+                const SizedBox(height: 32),
+                const Text('Recent Requests', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (_totalBookings == 0 && _pendingBookings == 0)
+                  _buildEmptyState()
+                else
+                  const Padding(padding: EdgeInsets.all(16), child: Text("Check the Bookings tab for details.")),
+              ],
+            ),
           ),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildMetricCard(BuildContext context, String title, String value, IconData icon, Color color) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 12),
-            Text(value, style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 24, color: color)),
-            const SizedBox(height: 4),
-            Text(title, style: Theme.of(context).textTheme.bodyMedium),
-          ],
-        ),
+  Widget _buildEmptyState() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      width: double.infinity,
+      decoration: BoxDecoration(color: AppTheme.cardColor, borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        children: [
+          Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          const Text('No recent bookings yet.', style: TextStyle(color: AppTheme.textSecondaryColor)),
+        ],
       ),
     );
   }
 
-  Widget _buildActivityTile(String title, String subtitle, String time, IconData icon) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: CircleAvatar(backgroundColor: AppTheme.cardColor, child: Icon(icon, color: AppTheme.accentColor)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textPrimaryColor)),
-        subtitle: Text(subtitle, style: const TextStyle(color: AppTheme.textSecondaryColor)),
-        trailing: Text(time, style: const TextStyle(color: AppTheme.textSecondaryColor, fontSize: 12)),
+  Widget _buildAnimatedRow(int rowIndex, List<Widget> children) {
+    return FadeTransition(
+      opacity: _fadeController,
+      child: SlideTransition(
+        position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(parent: _fadeController, curve: Interval(rowIndex * 0.2, 1.0, curve: Curves.easeOut)),
+        ),
+        child: Row(children: children.map((w) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: w))).toList()),
+      ),
+    );
+  }
+
+  Widget _buildMetricCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: color.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))],
+        border: Border.all(color: color.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 16),
+          Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color)),
+          const SizedBox(height: 4),
+          Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+        ],
       ),
     );
   }
@@ -214,22 +280,30 @@ class _VendorPropertiesViewState extends State<VendorPropertiesView> {
   Future<void> _fetchProperties() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final vendorId = authProvider.user?['_id'];
-    if (vendorId == null) return;
     
     try {
-      final response = await ApiService.get('/properties?vendor=$vendorId');
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        setState(() {
-          _properties = data.map((json) {
-            return Property.fromJson(json);
-          }).toList();
-        });
-      }
+      await ApiService.getWithCache(
+        endpoint: '/properties?vendor=$vendorId',
+        onCacheHit: (data) {
+          if (mounted) {
+            setState(() {
+              _properties = (data as List).map((json) => Property.fromJson(json)).toList();
+              _isLoading = false;
+            });
+          }
+        },
+        onSourceUpdate: (data) {
+          if (mounted) {
+            setState(() {
+              _properties = (data as List).map((json) => Property.fromJson(json)).toList();
+              _isLoading = false;
+            });
+          }
+        },
+      );
     } catch (e) {
-      // Ignored for UI
-    } finally {
-      setState(() => _isLoading = false);
+      debugPrint('Error: $e');
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -260,12 +334,23 @@ class _VendorPropertiesViewState extends State<VendorPropertiesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Properties')),
-      body: _isLoading
+      appBar: AppBar(
+        title: const Text('My Properties'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _fetchProperties,
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _fetchProperties,
+        child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _properties.isEmpty
               ? const Center(child: Text('You have no properties listed. Click Add to start!'))
               : ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   itemCount: _properties.length,
                   itemBuilder: (context, index) {
@@ -296,7 +381,8 @@ class _VendorPropertiesViewState extends State<VendorPropertiesView> {
                       ],
                     );
                   },
-                ),
+                  ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddPropertyScreen()));
@@ -331,16 +417,28 @@ class _VendorBookingsViewState extends State<VendorBookingsView> {
 
   Future<void> _fetchBookings() async {
     try {
-      final response = await ApiService.get('/bookings/vendor');
-      if (response.statusCode == 200) {
-        setState(() {
-          _bookings = jsonDecode(response.body);
-        });
-      }
+      await ApiService.getWithCache(
+        endpoint: '/bookings/vendor',
+        onCacheHit: (data) {
+          if (mounted) {
+            setState(() {
+              _bookings = data;
+              _isLoading = false;
+            });
+          }
+        },
+        onSourceUpdate: (data) {
+          if (mounted) {
+            setState(() {
+              _bookings = data;
+              _isLoading = false;
+            });
+          }
+        },
+      );
     } catch (e) {
-      // Ignore
-    } finally {
-      setState(() => _isLoading = false);
+      debugPrint('Error: $e');
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -362,12 +460,23 @@ class _VendorBookingsViewState extends State<VendorBookingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Booking Requests')),
-      body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
+      appBar: AppBar(
+        title: const Text('Booking Requests'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _fetchBookings,
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _fetchBookings,
+        child: _isLoading 
+          ? const Center(child: CircularProgressIndicator())
         : _bookings.isEmpty 
           ? const Center(child: Text('No incoming booking requests yet.'))
           : ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               itemCount: _bookings.length,
               itemBuilder: (context, index) {
@@ -470,6 +579,7 @@ class _VendorBookingsViewState extends State<VendorBookingsView> {
                 );
               },
             ),
+      ),
     );
   }
 }

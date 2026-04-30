@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
+import 'dart:async';
 import '../theme/app_theme.dart';
 import '../services/api_service.dart';
 import '../providers/auth_provider.dart';
@@ -19,25 +20,42 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _msgController = TextEditingController();
   List<dynamic> _messages = [];
   bool _isLoading = true;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _fetchMessages();
+    // Setup polling every 3 seconds for "real-time" feel
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (mounted) _fetchMessages(showLoading: false);
+    });
   }
 
-  Future<void> _fetchMessages() async {
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _msgController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchMessages({bool showLoading = true}) async {
+    if (showLoading) setState(() => _isLoading = true);
     try {
       final response = await ApiService.get('/chats/${widget.otherUserId}');
       if (response.statusCode == 200) {
-        setState(() {
-          _messages = jsonDecode(response.body);
-        });
+        final newMessages = jsonDecode(response.body);
+        // Only update if message count changed to prevent unnecessary rebuilds
+        if (newMessages.length != _messages.length && mounted) {
+          setState(() {
+            _messages = newMessages;
+          });
+        }
       }
     } catch (e) {
       // Ignored
     } finally {
-      setState(() => _isLoading = false);
+      if (showLoading && mounted) setState(() => _isLoading = false);
     }
   }
 

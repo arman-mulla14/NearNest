@@ -59,7 +59,8 @@ exports.getVendorBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ vendor: req.user._id })
       .populate('property')
-      .populate('user', 'name email location');
+      .populate('user', 'name email location')
+      .lean();
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -68,7 +69,10 @@ exports.getVendorBookings = async (req, res) => {
 
 exports.getUserBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user._id }).populate('property').populate('vendor', 'name email');
+    const bookings = await Booking.find({ user: req.user._id })
+      .populate('property')
+      .populate('vendor', 'name email')
+      .lean();
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ message: error.message });

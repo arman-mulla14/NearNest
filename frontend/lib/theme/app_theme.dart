@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // New Colors according to user's request
-  static const Color primaryColor = Color(0xFF1E3A8A); // Deep Blue
-  static const Color secondaryColor = Color(0xFF3B82F6); // Sky Blue
-  static const Color accentColor = Color(0xFF10B981); // Emerald Green
-  static const Color backgroundColor = Color(0xFFF9FAFB); // Light Gray
+  // Colors based on the screenshot
+  static const Color primaryColor = Color(0xFF223E92); // Royal Blue
+  static const Color secondaryColor = Color(0xFFC8F0E1); // Light Green badge
+  static const Color accentColor = Color(0xFF223E92); 
+  static const Color backgroundColor = Color(0xFFF9FAFC); // Off-White background
   
   // Supporting colors for light theme
-  static const Color textPrimaryColor = Color(0xFF111827); // Dark Gray for contrast
-  static const Color textSecondaryColor = Color(0xFF4B5563); // Medium Gray
+  static const Color textPrimaryColor = Color(0xFF1E293B); // Dark slate for text
+  static const Color textSecondaryColor = Color(0xFF64748B); // Slate Gray
   static const Color cardColor = Color(0xFFFFFFFF); // White for cards
   static const Color errorColor = Color(0xFFEF4444); // Red
   
@@ -35,11 +36,11 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
       ),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(color: textPrimaryColor, fontSize: 32, fontWeight: FontWeight.bold),
-        titleLarge: TextStyle(color: textPrimaryColor, fontSize: 24, fontWeight: FontWeight.w600),
-        bodyLarge: TextStyle(color: textPrimaryColor, fontSize: 16),
-        bodyMedium: TextStyle(color: textSecondaryColor, fontSize: 14),
+      textTheme: GoogleFonts.balsamiqSansTextTheme().copyWith(
+        displayLarge: const TextStyle(color: textPrimaryColor, fontSize: 32, fontWeight: FontWeight.bold),
+        titleLarge: const TextStyle(color: textPrimaryColor, fontSize: 24, fontWeight: FontWeight.w700),
+        bodyLarge: const TextStyle(color: textPrimaryColor, fontSize: 16),
+        bodyMedium: const TextStyle(color: textSecondaryColor, fontSize: 14),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -74,7 +75,7 @@ class AppTheme {
           borderSide: const BorderSide(color: secondaryColor, width: 2),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: cardColor,
         elevation: 2,
         shadowColor: Colors.black.withOpacity(0.05),
@@ -146,7 +147,7 @@ class AppTheme {
           borderSide: const BorderSide(color: accentColor, width: 2),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: const Color(0xFF1E1E1E),
         elevation: 2,
         shadowColor: Colors.black.withOpacity(0.2),

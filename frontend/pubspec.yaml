@@ -39,6 +39,12 @@ dependencies:
   http: ^1.6.0
   shared_preferences: ^2.5.3
   image_picker: ^1.1.1
+  shimmer: ^3.0.0
+  google_fonts: ^8.1.0
+  flutter_map: ^8.3.0
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.2
+  location: ^8.0.1
 
 dependency_overrides:
   flutter_plugin_android_lifecycle: 2.0.20

@@ -1,0 +1,24 @@
+NearNest Change History & Architecture Log
+
+1. Infrastructure & Scaling
+- Implemented load balancing for the mobile application.
+- Initial load balancing logic: Client-side Round-Robin between `nearnest-api.onrender.com` and `nearnest-q32b.onrender.com`.
+- Final load balancing logic: Active-Passive Failover Architecture. `nearnest-q32b` set as primary and `nearnest-api` as fallback. If the primary fails or times out (15s), requests seamlessly reroute to the fallback.
+- Identified and resolved a database desync issue where the secondary server had a slightly different MONGO_URI, resulting in missing properties. Both servers now point to the exact same Atlas database.
+
+2. App Feature: Interactive Maps & Routing
+- Added `flutter_map` integration to the `property_details_screen.dart`.
+- Enabled native Android location permissions (`ACCESS_FINE_LOCATION`).
+- Integrated the OSRM (Open Source Routing Machine) API to fetch driving directions and render polyline routes on the map.
+- Implemented map control buttons: Recenter to property, Zoom In, Zoom Out, and toggle between normal map view and real-life (satellite/Google-like) maps.
+
+3. App Feature: Vendor Offers
+- Extended the `Property` data model to support a new `offer` object (discount percentage, validFrom, validUntil).
+- Updated `add_property_screen.dart` with a dedicated "Run Offer" UI toggle.
+- Added start and end date pickers to let vendors schedule their discounts.
+- The property details screen now conditionally renders an "Offer Badge" when a property has active discounts.
+
+4. UI & Performance Optimizations
+- Image Compression: Integrated image compression to reduce size (to ~1-2MB) during uploads, reducing backend memory overhead.
+- Full-Screen Image UX: Disabled automatic full-screen transitions when tapping thumbnail gallery images. Replaced with an explicit button to view images in full screen.
+- Compiled the app into multiple production APKs (`NearNest_Update.apk`, `nearnest_production_test_1.apk`) to verify functionality.

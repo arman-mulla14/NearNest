@@ -6,12 +6,17 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/vendor_home_screen.dart';
+import 'screens/main_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/theme_provider.dart';
+
+import 'services/api_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  await ApiService.init();
+
   final authProvider = AuthProvider();
   await authProvider.loadUser();
   
@@ -47,9 +52,11 @@ class NearNestApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
+        '/main': (context) => const MainScreen(),
         '/home': (context) => const HomeScreen(),
         '/vendor_home': (context) => const VendorHomeScreen(),
       },
     );
   }
 }
+
