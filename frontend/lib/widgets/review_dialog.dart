@@ -21,7 +21,7 @@ class _ReviewDialogState extends State<ReviewDialog> {
   bool _isLoading = false;
 
   Future<void> _pickImages() async {
-    final List<XFile> pickedFiles = await _picker.pickMultiImage(limit: 3);
+    final List<XFile> pickedFiles = await _picker.pickMultiImage(imageQuality: 50, limit: 3);
     for (var file in pickedFiles) {
       if (_base64Images.length >= 3) break;
       final bytes = await file.readAsBytes();

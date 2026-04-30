@@ -18,6 +18,14 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).refreshProfile();
+    });
+  }
+
   void _logout() async {
     await Provider.of<AuthProvider>(context, listen: false).logout();
     if (!mounted) return;

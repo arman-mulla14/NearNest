@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         if (role == 'vendor') {
            Navigator.pushReplacementNamed(context, '/vendor_home');
         } else {
-           Navigator.pushReplacementNamed(context, '/home');
+           Navigator.pushReplacementNamed(context, '/main');
         }
       } else {
         Navigator.pushReplacementNamed(context, '/login');

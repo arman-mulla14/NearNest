@@ -2,7 +2,8 @@ const Property = require('../models/Property');
 
 exports.getProperties = async (req, res) => {
   try {
-    const { keyword, propertyType, maxPrice, vendor } = req.query;
+    console.log('getProperties called');
+    const { keyword, propertyType, maxPrice, vendor, page = 1, limit = 10 } = req.query;
     
     let query = {};
     if (keyword) {
@@ -18,9 +19,22 @@ exports.getProperties = async (req, res) => {
       query.vendor = vendor;
     }
 
-    const properties = await Property.find(query).populate('vendor', 'name email');
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    console.log('Executing DB query with:', query);
+    const properties = await Property.find(query)
+      .populate('vendor', 'name email')
+      .select({ ratings: 0, images: { $slice: 1 } }) 
+      .skip(skip)
+      .limit(limitNumber)
+      .lean();
+
+    console.log('Query successful, returning properties:', properties.length);
     res.json(properties);
   } catch (error) {
+    console.error('Error in getProperties:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -52,7 +66,8 @@ exports.createProperty = async (req, res) => {
       images: images || [],
       facilities: facilities || [],
       availableBeds,
-      availableTables
+      availableTables,
+      offer: req.body.offer || {}
     });
 
     const createdProperty = await property.save();
@@ -80,6 +95,9 @@ exports.updateProperty = async (req, res) => {
       property.facilities = req.body.facilities || property.facilities;
       property.availableBeds = req.body.availableBeds !== undefined ? req.body.availableBeds : property.availableBeds;
       property.availableTables = req.body.availableTables !== undefined ? req.body.availableTables : property.availableTables;
+      if (req.body.offer) {
+        property.offer = req.body.offer;
+      }
 
       const updatedProperty = await property.save();
       res.json(updatedProperty);

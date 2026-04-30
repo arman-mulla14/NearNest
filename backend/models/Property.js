@@ -5,6 +5,8 @@ const propertySchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   location: { type: String, required: true },
+  lat: { type: Number, default: 18.5204 },
+  lng: { type: Number, default: 73.8567 },
   price: { type: Number, required: true },
   propertyType: { type: String, enum: ['PG', 'Room', 'Lodge', 'Shared Stay', 'Traveling Stay', 'Restaurant'], required: true },
   images: [{ type: String }],
@@ -19,6 +21,11 @@ const propertySchema = new mongoose.Schema({
     images: [{ type: String }],
     createdAt: { type: Date, default: Date.now }
   }],
+  offer: {
+    discountPercentage: { type: Number, default: 0 },
+    startDate: { type: Date },
+    endDate: { type: Date }
+  }
 }, { timestamps: true });
 
 const Property = mongoose.model('Property', propertySchema);
