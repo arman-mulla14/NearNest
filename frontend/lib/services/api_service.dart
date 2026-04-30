@@ -20,9 +20,7 @@ class ApiService {
     _customBaseUrl = ip;
   }
 
-  // Primary and Secondary servers for Active-Passive load balancing
-  static const String _primaryServer = 'https://nearnest-q32b.onrender.com/api';
-  static const String _secondaryServer = 'https://nearnest-api.onrender.com/api';
+  static const String _primaryServer = 'https://nearnest-api.onrender.com/api';
 
   // Dynamic baseUrl for web and mobile
   static String get baseUrl {
@@ -43,30 +41,14 @@ class ApiService {
 
   static Future<http.Response> post(String endpoint, Map<String, dynamic> data) async {
     final headers = await _getHeaders();
-    try {
-      final url = Uri.parse('$baseUrl$endpoint');
-      final res = await http.post(url, headers: headers, body: jsonEncode(data)).timeout(const Duration(seconds: 15));
-      if (res.statusCode >= 500) throw Exception('Server error');
-      return res;
-    } catch (e) {
-      // Fallback to secondary server
-      final url = Uri.parse('$_secondaryServer$endpoint');
-      return await http.post(url, headers: headers, body: jsonEncode(data));
-    }
+    final url = Uri.parse('$baseUrl$endpoint');
+    return await http.post(url, headers: headers, body: jsonEncode(data));
   }
 
   static Future<http.Response> get(String endpoint) async {
     final headers = await _getHeaders();
-    try {
-      final url = Uri.parse('$baseUrl$endpoint');
-      final res = await http.get(url, headers: headers).timeout(const Duration(seconds: 15));
-      if (res.statusCode >= 500) throw Exception('Server error');
-      return res;
-    } catch (e) {
-      // Fallback to secondary server
-      final url = Uri.parse('$_secondaryServer$endpoint');
-      return await http.get(url, headers: headers);
-    }
+    final url = Uri.parse('$baseUrl$endpoint');
+    return await http.get(url, headers: headers);
   }
 
   static Future<http.Response> getRaw(String fullUrl) async {
@@ -127,27 +109,13 @@ class ApiService {
 
   static Future<http.Response> put(String endpoint, Map<String, dynamic> data) async {
     final headers = await _getHeaders();
-    try {
-      final url = Uri.parse('$baseUrl$endpoint');
-      final res = await http.put(url, headers: headers, body: jsonEncode(data)).timeout(const Duration(seconds: 15));
-      if (res.statusCode >= 500) throw Exception('Server error');
-      return res;
-    } catch (e) {
-      final url = Uri.parse('$_secondaryServer$endpoint');
-      return await http.put(url, headers: headers, body: jsonEncode(data));
-    }
+    final url = Uri.parse('$baseUrl$endpoint');
+    return await http.put(url, headers: headers, body: jsonEncode(data));
   }
 
   static Future<http.Response> delete(String endpoint) async {
     final headers = await _getHeaders();
-    try {
-      final url = Uri.parse('$baseUrl$endpoint');
-      final res = await http.delete(url, headers: headers).timeout(const Duration(seconds: 15));
-      if (res.statusCode >= 500) throw Exception('Server error');
-      return res;
-    } catch (e) {
-      final url = Uri.parse('$_secondaryServer$endpoint');
-      return await http.delete(url, headers: headers);
-    }
+    final url = Uri.parse('$baseUrl$endpoint');
+    return await http.delete(url, headers: headers);
   }
 }
